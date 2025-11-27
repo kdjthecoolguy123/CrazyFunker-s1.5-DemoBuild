@@ -25,7 +25,7 @@ class MainMenuState extends MusicBeatState
 
 	//Centered/Text options
 	var optionShit:Array<String> = [
-		'freeplay',
+		'freeplay', 
 	];
 
 	var leftOption:String = null;
