@@ -129,12 +129,18 @@ class VisualsSettingsSubState extends BaseOptionsMenu
 		addOption(option);
 		option.onChange = onChangeFPSCounter;
 		#end
+
+		var option:Option = new Option('Detailed FPS Counter',
+			'If checked, displays more information on the FPS Counter.',
+			'detailedFPS',
+			BOOL);
+		addOption(option);
 		
 		var option:Option = new Option('Pause Music:',
 			"What song do you prefer for the Pause Screen?",
 			'pauseMusic',
 			STRING,
-			['None', 'Tea Time', 'Breakfast', 'Breakfast (Pico)']);
+			['None', "Song Based", 'Tea Time (Kdj)', 'Tea Time (Goober)', 'Tea Time (Mira)']);
 		addOption(option);
 		option.onChange = onChangePauseMusic;
 		

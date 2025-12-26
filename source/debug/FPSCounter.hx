@@ -1,8 +1,12 @@
 package debug;
 
+import sys.io.Process;
+import sys.FileSystem;
 import flixel.FlxG;
 import openfl.text.TextField;
+import openfl.display.BlendMode;
 import openfl.text.TextFormat;
+import backend.ClientPrefs;
 import openfl.system.System;
 
 /**
@@ -20,6 +24,9 @@ class FPSCounter extends TextField
 		The current memory usage (WARNING: this is NOT your total program memory usage, rather it shows the garbage collector memory)
 	**/
 	public var memoryMegas(get, never):Float;
+	public var ramUsage(get, never):Float;
+	private var extensionRAM:String = '';
+	private var extensionPC:String = '';
 
 	@:noCompletion private var times:Array<Float>;
 
@@ -33,7 +40,9 @@ class FPSCounter extends TextField
 		currentFPS = 0;
 		selectable = false;
 		mouseEnabled = false;
-		defaultTextFormat = new TextFormat("_sans", 14, color);
+        defaultTextFormat = new TextFormat(openfl.utils.Assets.getFont("assets/fonts/vcr.ttf").fontName, 15, color, true);
+        embedFonts = true;
+		this.blendMode = BlendMode.ADD;
 		autoSize = LEFT;
 		multiline = true;
 		text = "FPS: ";
@@ -60,9 +69,35 @@ class FPSCounter extends TextField
 		deltaTimeout = 0.0;
 	}
 
+	inline function get_ramUsage():Float {
+		#if windows
+		return (cast(System.totalMemory, Float) / 1024 / 1024);
+		#else
+		return 0;
+		#end
+	}
+
+	function onUpdate() {
+		var username = Sys.environment()["USERNAME"];
+		var os = Sys.systemName();
+
+		if (ClientPrefs.data.detailedFPS) {
+			extensionPC = 'User: $username' + ' | OS: $os';
+			extensionRAM = ' | RAM: ${Math.floor(ramUsage)}MB';
+		} else {
+			extensionPC = '';
+			extensionRAM = '';
+		}
+	}
+
 	public dynamic function updateText():Void { // so people can override it in hscript
-		text = 'FPS: ${currentFPS}'
-		+ '\nMemory: ${flixel.util.FlxStringUtil.formatBytes(memoryMegas)}';
+		onUpdate();
+
+		text = 'FPS: ${currentFPS}' + 
+		' | Memory: ${flixel.util.FlxStringUtil.formatBytes(memoryMegas)}' 
+		+ '${extensionRAM}'
+		+ "\nCrazy Funker's 1.5 - Developer Build | [DO NOT DISTRIBUTE]"
+		+ '\n${extensionPC}';
 
 		textColor = 0xFFFFFFFF;
 		if (currentFPS < FlxG.drawFramerate * 0.5)
